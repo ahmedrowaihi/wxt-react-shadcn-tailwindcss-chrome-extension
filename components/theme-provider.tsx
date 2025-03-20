@@ -1,34 +1,38 @@
 // ThemeContext.js
-import React, {createContext, useState, useContext, useEffect} from 'react';
+import React, { createContext, useState, useContext, useEffect } from "react";
+import { browser } from "wxt/browser";
 
-const ThemeContext = createContext<{ theme: string, toggleTheme: Function }>({
-    theme: 'light', toggleTheme: (theme: string) => {
-    }
+const ThemeContext = createContext<{ theme: string; toggleTheme: Function }>({
+  theme: "dark",
+  toggleTheme: (theme: string) => {},
 });
 
 export const useTheme = () => useContext(ThemeContext);
 
-export const ThemeProvider = ({children}: { children: any }) => {
-    const [theme, setTheme] = useState('light');
+export const ThemeProvider = ({ children }: { children: any }) => {
+  const [theme, setTheme] = useState("dark");
 
-    const toggleTheme = (theme: string) => {
-        setTheme(theme);
-    };
+  const toggleTheme = (theme: string) => {
+    setTheme(theme);
+  };
 
-    async function initTheme() {
-        let data = await browser.storage.local.get('theme');
-        if (data.theme) {
-            setTheme(data.theme)
-        }
+  async function initTheme() {
+    let data = await browser.storage.local.get("theme");
+    if (data.theme) {
+      setTheme(data.theme);
+    } else {
+      // Set default theme to dark if no theme is stored
+      await browser.storage.local.set({ theme: "dark" });
     }
+  }
 
-    useEffect(() => {
-        initTheme();
-    }, []);
+  useEffect(() => {
+    initTheme();
+  }, []);
 
-    return (
-        <ThemeContext.Provider value={{theme, toggleTheme}}>
-            {children}
-        </ThemeContext.Provider>
-    );
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
 };
